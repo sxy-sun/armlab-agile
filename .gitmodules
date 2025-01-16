@@ -1,0 +1,4 @@
+[submodule "lib/Piper_ros"]
+	path = lib/Piper_ros
+	url = https://github.com/agilexrobotics/Piper_ros.git
+	branch = ros-humble-no-aloha
