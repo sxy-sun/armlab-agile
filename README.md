@@ -35,13 +35,7 @@ You do need to modify **some** of these files.
         - A function to read the RX200 arm config file
     - `state_machine.py` - Implements the StateMachine class
         - The state machine is the heart of the controller
-- [config](config)
-    - `rx200_dh.csv` - Contains the DH table for the RX200 arm
-        - You will need to fill this in
-    - `rx200_pox.csv` - Containes the S list and M matrix for the RX200 arm.
-        - You will need to fill this in
-
-
+        
 ### Irrelevant
 Not need to touch these files.
 - [media](media) - where we store media that used for README instructions
