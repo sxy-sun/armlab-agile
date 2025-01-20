@@ -36,23 +36,6 @@ D2R = np.pi / 180.0
 R2D = 180.0 / np.pi
 
 
-def _ensure_initialized(func):
-    """!
-    @brief      Decorator to skip the function if the RXArm is not initialized.
-
-    @param      func  The function to wrap
-
-    @return     The wraped function
-    """
-    def func_out(self, *args, **kwargs):
-        if self.initialized:
-            return func(self, *args, **kwargs)
-        else:
-            print('WARNING: Trying to use the RXArm before initialized')
-
-    return func_out
-
-
 class RXArm(InterbotixManipulatorXS):
     """!
     @brief      This class describes a RXArm wrapper class for the rx200
