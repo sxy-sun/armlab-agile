@@ -31,7 +31,7 @@ class Gui(QMainWindow):
 
     Contains the main function and interfaces between the GUI and functions.
     """
-    def __init__(self, parent=None, dh_config_file=None):
+    def __init__(self, parent=None):
         QWidget.__init__(self, parent)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
@@ -60,10 +60,7 @@ class Gui(QMainWindow):
         """Objects Using Other Classes"""
         self.camera = Camera()
         print("Creating rx arm...")
-        if (dh_config_file is not None):
-            self.rxarm = RXArm(dh_config_file=dh_config_file)
-        else:
-            self.rxarm = RXArm()
+        self.rxarm = RXArm()
         print("Done creating rx arm instance.")
         self.sm = StateMachine(self.rxarm, self.camera)
         """
@@ -85,16 +82,17 @@ class Gui(QMainWindow):
             lambda: self.rxarm.disable_torque())
         self.ui.btn_torq_on.clicked.connect(lambda: self.rxarm.enable_torque())
         self.ui.btn_sleep_arm.clicked.connect(lambda: self.rxarm.sleep())
+        self.ui.btn_calibrate.clicked.connect(partial(nxt_if_arm_init, 'calibrate'))
 
-        #User Buttons
-        self.ui.btnUser1.setText("Calibrate")
-        self.ui.btnUser1.clicked.connect(partial(nxt_if_arm_init, 'calibrate'))
-        self.ui.btnUser2.setText('Open Gripper')
-        self.ui.btnUser2.clicked.connect(lambda: self.rxarm.gripper.release())
-        self.ui.btnUser3.setText('Close Gripper')
-        self.ui.btnUser3.clicked.connect(lambda: self.rxarm.gripper.grasp())
-        self.ui.btnUser4.setText('Execute')
-        self.ui.btnUser4.clicked.connect(partial(nxt_if_arm_init, 'execute'))
+        # User Buttons
+        # TODO: Add more lines here to add more buttons
+        # To make a button activate a state, copy the lines for btnUser3 but change 'execute' to whichever state you want
+        self.ui.btnUser1.setText('Open Gripper')
+        self.ui.btnUser1.clicked.connect(lambda: self.rxarm.gripper.release())
+        self.ui.btnUser2.setText('Close Gripper')
+        self.ui.btnUser2.clicked.connect(lambda: self.rxarm.gripper.grasp())
+        self.ui.btnUser3.setText('Execute')
+        self.ui.btnUser3.clicked.connect(partial(nxt_if_arm_init, 'execute'))
 
         # Sliders
         for sldr in self.joint_sliders:
@@ -134,8 +132,7 @@ class Gui(QMainWindow):
         for rdout, joint in zip(self.joint_readouts, joints):
             rdout.setText(str('%+.2f' % (joint * R2D)))
 
-    ### TODO: output the rest of the orientation according to the convention chosen
-    ### Distances should be in mm
+    # Distances should be in mm
     @pyqtSlot(list)
     def updateEndEffectorReadout(self, pos):
         self.ui.rdoutX.setText(str("%+.2f mm" % (pos[0])))
@@ -219,6 +216,9 @@ class Gui(QMainWindow):
         @param      mouse_event  QtMouseEvent containing the pose of the mouse at the time of the event not current time
         """
 
+        # TODO: Modify this function to change the mouseover text.
+        # You should make the mouseover text display the (x, y, z) coordinates of the pixel being hovered over
+
         pt = mouse_event.pos()
         if self.camera.DepthFrameRaw.any() != 0:
             z = self.camera.DepthFrameRaw[pt.y()][pt.x()]
@@ -237,7 +237,6 @@ class Gui(QMainWindow):
         self.camera.last_click[0] = pt.x()
         self.camera.last_click[1] = pt.y()
         self.camera.new_click = True
-        # print(self.camera.last_click)
 
     def initRxarm(self):
         """!
@@ -250,12 +249,12 @@ class Gui(QMainWindow):
 
 
 ### TODO: Add ability to parse POX config file as well
-def main(args=None):
+def main():
     """!
     @brief      Starts the GUI
     """
     app = QApplication(sys.argv)
-    app_window = Gui(dh_config_file=args['dhconfig'])
+    app_window = Gui()
     app_window.show()
 
     # Set thread priorities
@@ -267,11 +266,5 @@ def main(args=None):
 
 
 # Run main if this file is being run directly
-### TODO: Add ability to parse POX config file as well
 if __name__ == '__main__':
-    ap = argparse.ArgumentParser()
-    ap.add_argument("-c",
-                    "--dhconfig",
-                    required=False,
-                    help="path to DH parameters csv file")
-    main(args=vars(ap.parse_args()))
+    main()

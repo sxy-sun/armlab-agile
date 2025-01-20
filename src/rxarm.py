@@ -18,9 +18,8 @@ import time
 import csv
 import sys, os
 
-from builtins import super
 from PyQt5.QtCore import QThread, pyqtSignal, QTimer
-from resource.config_parse import parse_dh_param_file
+from resource.config_parse import parse_dh_param_file, parse_pox_param_file
 from sensor_msgs.msg import JointState
 import rclpy
 from rclpy.executors import SingleThreadedExecutor
@@ -58,7 +57,7 @@ class RXArm(InterbotixManipulatorXS):
     """!
     @brief      This class describes a RXArm wrapper class for the rx200
     """
-    def __init__(self, dh_config_file=None):
+    def __init__(self):
         """!
         @brief      Constructs a new instance.
 
@@ -70,8 +69,6 @@ class RXArm(InterbotixManipulatorXS):
         super().__init__(robot_model="rx200")
         self.joint_names = self.arm.group_info.joint_names
         self.num_joints = 5
-        # Gripper
-        self.gripper_state = True
         # State
         self.initialized = False
         # Cmd
@@ -83,13 +80,9 @@ class RXArm(InterbotixManipulatorXS):
         self.velocity_fb = None
         self.effort_fb = None
         # DH Params
-        self.dh_params = []
-        self.dh_config_file = dh_config_file
-        if (dh_config_file is not None):
-            self.dh_params = RXArm.parse_dh_param_file(dh_config_file)
+        self.dh_params = parse_dh_param_file(os.path.join(os.path.dirname(__file__), '../config/rx200_dh.csv'))
         #POX params
-        self.M_matrix = []
-        self.S_list = []
+        self.M_matrix, self.S_list = parse_pox_param_file(os.path.join(os.path.dirname(__file__), '../config/rx200_pox.csv'))
 
     def initialize(self):
         """!
@@ -186,30 +179,17 @@ class RXArm(InterbotixManipulatorXS):
         return self.effort_fb
 
 
-#   @_ensure_initialized
-
     def get_ee_pose(self):
         """!
-        @brief      TODO Get the EE pose. Distances should be in mm
+        @brief      Get the EE pose. Distances should be in mm
 
         @return     The EE pose as [x, y, z, phi, theta, psi]
         """
-        return [0, 0, 0, 0, 0, 0]
 
-
-    def parse_pox_param_file(self):
-        """!
-        @brief      TODO Parse a PoX config file
-
-        @return     0 if file was parsed, -1 otherwise 
-        """
-        return -1
-
-    def parse_dh_param_file(self):
-        print("Parsing DH config file...")
-        dh_params = parse_dh_param_file(self.dh_config_file)
-        print("DH config file parse exit.")
-        return dh_params
+        # TODO: Change the following function to FK_pox if you're using PoX
+        ee_T = FK_dh(self.dh_params, self.get_positions(), self.num_joints)
+        ee_pose = get_pose_from_T(ee_T)
+        return ee_pose
 
     def get_dh_parameters(self):
         """!

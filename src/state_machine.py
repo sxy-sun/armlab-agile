@@ -54,8 +54,12 @@ class StateMachine():
 
                     This is run in its own thread.
 
-                    TODO: Add states and funcitons as needed.
+                    TODO: Add states and functions as needed.
         """
+
+        # IMPORTANT: This function runs in a loop. If you make a new state, it will be run every iteration.
+        #            The function (and the state functions within) will continuously be called until the state changes.
+
         if self.next_state == "initialize_rxarm":
             self.initialize_rxarm()
 

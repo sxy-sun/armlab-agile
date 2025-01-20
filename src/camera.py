@@ -38,18 +38,18 @@ class Camera():
 
 
         # mouse clicks & calibration variables
-        self.cameraCalibrated = False
+        self.camera_calibrated = False
         self.intrinsic_matrix = np.eye(3)
         self.extrinsic_matrix = np.eye(4)
-        self.last_click = np.array([0, 0])
-        self.new_click = False
+        self.last_click = np.array([0, 0]) # This contains the last clicked position
+        self.new_click = False # This is automatically set to True whenever a click is received. Set it to False yourself after processing a click
         self.rgb_click_points = np.zeros((5, 2), int)
         self.depth_click_points = np.zeros((5, 2), int)
         self.grid_x_points = np.arange(-450, 500, 50)
         self.grid_y_points = np.arange(-175, 525, 50)
         self.grid_points = np.array(np.meshgrid(self.grid_x_points, self.grid_y_points))
         self.tag_detections = np.array([])
-        self.tag_locations = [[-250, -25], [250, -25], [250, 275]]
+        self.tag_locations = [[-250, -25], [250, -25], [250, 275], [-250, 275]]
         """ block info """
         self.block_contours = np.array([])
         self.block_detections = np.array([])
@@ -190,11 +190,14 @@ class Camera():
         @brief      projects
 
                     TODO: Use the intrinsic and extrinsic matricies to project the gridpoints 
-                    on the board into pixel coordinates. copy self.VideoFrame to self.GridFrame and
+                    on the board into pixel coordinates. copy self.VideoFrame to self.GridFrame
                     and draw on self.GridFrame the grid intersection points from self.grid_points
                     (hint: use the cv2.circle function to draw circles on the image)
         """
-        pass
+        modified_image = self.VideoFrame.copy()
+        # Write your code here
+
+        self.GridFrame = modified_image
      
     def drawTagsInRGBImage(self, msg):
         """

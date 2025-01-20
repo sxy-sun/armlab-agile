@@ -87,7 +87,7 @@ def get_pose_from_T(T):
 
     @return     The pose vector from T.
     """
-    pass
+    return [0, 0, 0, 0, 0, 0]
 
 
 def FK_pox(joint_angles, m_mat, s_lst):
