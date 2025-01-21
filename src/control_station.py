@@ -2,24 +2,17 @@
 """!
 Main GUI for Arm lab
 """
-import os, sys
-script_path = os.path.dirname(os.path.realpath(__file__))
-
-import argparse
-import cv2
+import sys
 import numpy as np
-import rclpy
-import time
 from functools import partial
-
-from PyQt5.QtCore import QThread, Qt, pyqtSignal, pyqtSlot, QTimer
-from PyQt5.QtGui import QPixmap, QImage, QCursor
-from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QMainWindow, QFileDialog
-
+from PyQt5.QtCore import QThread, Qt, pyqtSlot
+from PyQt5.QtGui import QPixmap, QImage 
+from PyQt5.QtWidgets import QApplication, QWidget, QMainWindow
 from resource.ui import Ui_MainWindow
-from rxarm import RXArm, RXArmThread
+from piper_arm import PiperArm, PiperArmThread
 from camera import Camera, VideoThread
 from state_machine import StateMachine, StateMachineThread
+
 """ Radians to/from  Degrees conversions """
 D2R = np.pi / 180.0
 R2D = 180.0 / np.pi
