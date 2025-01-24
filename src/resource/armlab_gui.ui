@@ -68,7 +68,7 @@
            <item>
             <layout class="QVBoxLayout" name="verticalLayout_9">
              <item alignment="Qt::AlignRight">
-              <widget class="QLabel" name="BLabel">
+              <widget class="QLabel" name="J1Label">
                <property name="font">
                 <font>
                  <family>Ubuntu Mono</family>
@@ -76,12 +76,12 @@
                 </font>
                </property>
                <property name="text">
-                <string>B:</string>
+                <string>Joint1:</string>
                </property>
               </widget>
              </item>
              <item alignment="Qt::AlignRight">
-              <widget class="QLabel" name="SLabel">
+              <widget class="QLabel" name="J2Label">
                <property name="font">
                 <font>
                  <family>Ubuntu Mono</family>
@@ -89,12 +89,12 @@
                 </font>
                </property>
                <property name="text">
-                <string>S:</string>
+                <string>Joint2:</string>
                </property>
               </widget>
              </item>
              <item alignment="Qt::AlignRight">
-              <widget class="QLabel" name="ELabel">
+              <widget class="QLabel" name="J3Label">
                <property name="font">
                 <font>
                  <family>Ubuntu Mono</family>
@@ -102,12 +102,12 @@
                 </font>
                </property>
                <property name="text">
-                <string>E:</string>
+                <string>Joint3:</string>
                </property>
               </widget>
              </item>
              <item alignment="Qt::AlignRight">
-              <widget class="QLabel" name="WALabel">
+              <widget class="QLabel" name="J4Label">
                <property name="font">
                 <font>
                  <family>Ubuntu Mono</family>
@@ -115,12 +115,12 @@
                 </font>
                </property>
                <property name="text">
-                <string>WA:</string>
+                <string>Joint4:</string>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QLabel" name="WRLabel">
+              <widget class="QLabel" name="J5Label">
                <property name="font">
                 <font>
                  <family>Ubuntu Mono</family>
@@ -128,7 +128,23 @@
                 </font>
                </property>
                <property name="text">
-                <string>WR:</string>
+                <string>Joint5:</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="J6Label">
+               <property name="font">
+                <font>
+                 <family>Ubuntu Mono</family>
+                 <pointsize>12</pointsize>
+                </font>
+               </property>
+               <property name="text">
+                <string>Joint6:</string>
                </property>
                <property name="alignment">
                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -140,7 +156,7 @@
            <item>
             <layout class="QVBoxLayout" name="verticalLayout_8">
              <item alignment="Qt::AlignLeft">
-              <widget class="QLabel" name="rdoutBaseJC">
+              <widget class="QLabel" name="rdoutJ1coords">
                <property name="font">
                 <font>
                  <family>Ubuntu Mono</family>
@@ -153,7 +169,7 @@
               </widget>
              </item>
              <item alignment="Qt::AlignLeft">
-              <widget class="QLabel" name="rdoutShoulderJC">
+              <widget class="QLabel" name="rdoutJ2coords">
                <property name="font">
                 <font>
                  <family>Ubuntu Mono</family>
@@ -166,7 +182,7 @@
               </widget>
              </item>
              <item alignment="Qt::AlignLeft">
-              <widget class="QLabel" name="rdoutElbowJC">
+              <widget class="QLabel" name="rdoutJ3coords">
                <property name="font">
                 <font>
                  <family>Ubuntu Mono</family>
@@ -179,7 +195,7 @@
               </widget>
              </item>
              <item alignment="Qt::AlignLeft">
-              <widget class="QLabel" name="rdoutWristAJC">
+              <widget class="QLabel" name="rdoutJ4coords">
                <property name="font">
                 <font>
                  <family>Ubuntu Mono</family>
@@ -192,7 +208,20 @@
               </widget>
              </item>
              <item>
-              <widget class="QLabel" name="rdoutWristRJC">
+              <widget class="QLabel" name="rdoutJ5coords">
+               <property name="font">
+                <font>
+                 <family>Ubuntu Mono</family>
+                 <pointsize>12</pointsize>
+                </font>
+               </property>
+               <property name="text">
+                <string>0</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="rdoutJ6coords">
                <property name="font">
                 <font>
                  <family>Ubuntu Mono</family>
@@ -409,7 +438,16 @@
          </item>
          <item>
           <layout class="QVBoxLayout" name="Group2">
-           <property name="margin">
+           <property name="leftMargin">
+            <number>10</number>
+           </property>
+           <property name="topMargin">
+            <number>10</number>
+           </property>
+           <property name="rightMargin">
+            <number>10</number>
+           </property>
+           <property name="bottomMargin">
             <number>10</number>
            </property>
            <item>

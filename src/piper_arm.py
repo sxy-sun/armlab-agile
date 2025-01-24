@@ -36,7 +36,7 @@ class PiperArm(Node):
         if not self.enable_arm():
             raise RuntimeError("Failed to enable arm.")
         self.gripper_open()  # Release gripper
-        self.set_positions([0.0] * self.num_joints)  # Reset all joints to initial position
+        # self.set_positions([0.0] * self.num_joints)  # Reset all joints to initial position
         self.initialized = True
         self.get_logger().info("Piper Arm initialized and reset to initial position.")
 

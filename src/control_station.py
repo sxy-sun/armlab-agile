@@ -52,10 +52,10 @@ class Gui(QMainWindow):
         ]
         """Objects Using Other Classes"""
         self.camera = Camera()
-        print("Creating rx arm...")
-        self.rxarm = RXArm()
-        print("Done creating rx arm instance.")
-        self.sm = StateMachine(self.rxarm, self.camera)
+        print("Creating piper arm...")
+        self.piper = PiperArm()
+        print("Done creating piper arm instance.")
+        self.sm = StateMachine(self.piper, self.camera)
         """
         Attach Functions to Buttons & Sliders
         TODO: NAME AND CONNECT BUTTONS AS NEEDED
@@ -240,8 +240,6 @@ class Gui(QMainWindow):
         self.rxarm.enable_torque()
         self.sm.set_next_state('initialize_rxarm')
 
-
-### TODO: Add ability to parse POX config file as well
 def main():
     """!
     @brief      Starts the GUI
@@ -257,7 +255,5 @@ def main():
 
     sys.exit(app.exec_())
 
-
-# Run main if this file is being run directly
 if __name__ == '__main__':
     main()
