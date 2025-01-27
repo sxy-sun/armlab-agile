@@ -30,25 +30,28 @@ class Gui(QMainWindow):
         self.ui.setupUi(self)
         """ Groups of ui commonents """
         self.joint_readouts = [
-            self.ui.rdoutBaseJC,
-            self.ui.rdoutShoulderJC,
-            self.ui.rdoutElbowJC,
-            self.ui.rdoutWristAJC,
-            self.ui.rdoutWristRJC,
+            self.ui.rdoutJ1coords,
+            self.ui.rdoutJ2coords,
+            self.ui.rdoutJ3coords,
+            self.ui.rdoutJ4coords,
+            self.ui.rdoutJ5coords,
+            self.ui.rdoutJ6coords
         ]
         self.joint_slider_rdouts = [
-            self.ui.rdoutBase,
-            self.ui.rdoutShoulder,
-            self.ui.rdoutElbow,
-            self.ui.rdoutWristA,
-            self.ui.rdoutWristR,
+            self.ui.rdoutJ1,
+            self.ui.rdoutJ2,
+            self.ui.rdoutJ3,
+            self.ui.rdoutJ4,
+            self.ui.rdoutJ5,
+            self.ui.rdoutJ6
         ]
         self.joint_sliders = [
-            self.ui.sldrBase,
-            self.ui.sldrShoulder,
-            self.ui.sldrElbow,
-            self.ui.sldrWristA,
-            self.ui.sldrWristR,
+            self.ui.sldrJ1,
+            self.ui.sldrJ2,
+            self.ui.sldrJ3,
+            self.ui.sldrJ4,
+            self.ui.sldrJ5,
+            self.ui.sldrJ6
         ]
         """Objects Using Other Classes"""
         self.camera = Camera()
@@ -58,7 +61,6 @@ class Gui(QMainWindow):
         self.sm = StateMachine(self.piper, self.camera)
         """
         Attach Functions to Buttons & Sliders
-        TODO: NAME AND CONNECT BUTTONS AS NEEDED
         """
         # Video
         self.ui.videoDisplay.setMouseTracking(True)
@@ -92,14 +94,17 @@ class Gui(QMainWindow):
             sldr.valueChanged.connect(self.sliderChange)
         self.ui.sldrMoveTime.valueChanged.connect(self.sliderChange)
         self.ui.sldrAccelTime.valueChanged.connect(self.sliderChange)
+        
         # Direct Control
         self.ui.chk_directcontrol.stateChanged.connect(self.directControlChk)
+
         # Status
         self.ui.rdoutStatus.setText("Waiting for input")
+
         """initalize manual control off"""
         self.ui.SliderFrame.setEnabled(False)
-        """Setup Threads"""
 
+        """Setup Threads"""
         # State machine
         self.StateMachineThread = StateMachineThread(self.sm)
         self.StateMachineThread.updateStatusMessage.connect(
