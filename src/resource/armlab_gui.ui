@@ -2,12 +2,15 @@
 <ui version="4.0">
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
+  <property name="enabled">
+   <bool>true</bool>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1750</width>
-    <height>1048</height>
+    <width>1738</width>
+    <height>1053</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -27,7 +30,7 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_13">
       <item>
-       <widget class="QFrame" name="OutputFrame">
+       <widget class="QFrame" name="LeftSidePanel">
         <property name="enabled">
          <bool>true</bool>
         </property>
@@ -64,7 +67,7 @@
           </widget>
          </item>
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_3">
+          <layout class="QHBoxLayout" name="JointCoords">
            <item>
             <layout class="QVBoxLayout" name="verticalLayout_9">
              <item alignment="Qt::AlignRight">
@@ -251,7 +254,7 @@
           </widget>
          </item>
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_4">
+          <layout class="QHBoxLayout" name="EELocations">
            <item>
             <layout class="QVBoxLayout" name="verticalLayout_13">
              <item alignment="Qt::AlignRight">
@@ -437,7 +440,7 @@
           </layout>
          </item>
          <item>
-          <layout class="QVBoxLayout" name="Group2">
+          <layout class="QVBoxLayout" name="LeftUserButtons">
            <property name="leftMargin">
             <number>10</number>
            </property>
@@ -562,9 +565,9 @@
        </widget>
       </item>
       <item>
-       <layout class="QVBoxLayout" name="verticalLayout_4">
+       <layout class="QVBoxLayout" name="CenterPanel">
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_12">
+         <layout class="QHBoxLayout" name="Display">
           <item>
            <spacer name="horizontalSpacer_8">
             <property name="orientation">
@@ -622,7 +625,7 @@
          </layout>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <layout class="QHBoxLayout" name="CheckboxAndCoords">
           <item>
            <widget class="QCheckBox" name="chk_directcontrol">
             <property name="text">
@@ -654,9 +657,9 @@
            </widget>
           </item>
           <item>
-           <widget class="QRadioButton" name="radioUsr1">
+           <widget class="QRadioButton" name="radioApriltag">
             <property name="text">
-             <string>Tags</string>
+             <string>Apriltag</string>
             </property>
            </widget>
           </item>
@@ -784,246 +787,48 @@
           <property name="lineWidth">
            <number>1</number>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout_16">
+          <layout class="QHBoxLayout" name="horizontalLayout_2">
            <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_6"/>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_9">
+            <layout class="QVBoxLayout" name="JointSliders">
              <item>
-              <layout class="QVBoxLayout" name="verticalLayout_2">
+              <layout class="QHBoxLayout" name="Joint1Slider">
                <item>
-                <layout class="QHBoxLayout" name="horizontalLayout">
-                 <item>
-                  <widget class="QLabel" name="BLabelS">
-                   <property name="minimumSize">
-                    <size>
-                     <width>150</width>
-                     <height>0</height>
-                    </size>
-                   </property>
-                   <property name="text">
-                    <string>Base</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QSlider" name="sldrBase">
-                   <property name="minimum">
-                    <number>-179</number>
-                   </property>
-                   <property name="maximum">
-                    <number>180</number>
-                   </property>
-                   <property name="orientation">
-                    <enum>Qt::Horizontal</enum>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QLabel" name="rdoutBase">
-                   <property name="minimumSize">
-                    <size>
-                     <width>30</width>
-                     <height>0</height>
-                    </size>
-                   </property>
-                   <property name="text">
-                    <string>0</string>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_7">
-                 <item>
-                  <widget class="QLabel" name="SLabelS">
-                   <property name="minimumSize">
-                    <size>
-                     <width>150</width>
-                     <height>0</height>
-                    </size>
-                   </property>
-                   <property name="text">
-                    <string>Shoulder</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QSlider" name="sldrShoulder">
-                   <property name="minimum">
-                    <number>-179</number>
-                   </property>
-                   <property name="maximum">
-                    <number>180</number>
-                   </property>
-                   <property name="orientation">
-                    <enum>Qt::Horizontal</enum>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QLabel" name="rdoutShoulder">
-                   <property name="text">
-                    <string>0</string>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_8">
-                 <item>
-                  <widget class="QLabel" name="ELabelS">
-                   <property name="minimumSize">
-                    <size>
-                     <width>150</width>
-                     <height>0</height>
-                    </size>
-                   </property>
-                   <property name="text">
-                    <string>Elbow</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QSlider" name="sldrElbow">
-                   <property name="minimum">
-                    <number>-179</number>
-                   </property>
-                   <property name="maximum">
-                    <number>180</number>
-                   </property>
-                   <property name="orientation">
-                    <enum>Qt::Horizontal</enum>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QLabel" name="rdoutElbow">
-                   <property name="text">
-                    <string>0</string>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_11">
-                 <item>
-                  <widget class="QLabel" name="WALabelS">
-                   <property name="minimumSize">
-                    <size>
-                     <width>150</width>
-                     <height>0</height>
-                    </size>
-                   </property>
-                   <property name="text">
-                    <string>Wrist Angle</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QSlider" name="sldrWristA">
-                   <property name="minimum">
-                    <number>-179</number>
-                   </property>
-                   <property name="maximum">
-                    <number>180</number>
-                   </property>
-                   <property name="orientation">
-                    <enum>Qt::Horizontal</enum>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QLabel" name="rdoutWristA">
-                   <property name="text">
-                    <string>0</string>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_15">
-                 <item>
-                  <widget class="QLabel" name="WRLabelS">
-                   <property name="minimumSize">
-                    <size>
-                     <width>150</width>
-                     <height>0</height>
-                    </size>
-                   </property>
-                   <property name="text">
-                    <string>Wrist Rotate</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QSlider" name="sldrWristR">
-                   <property name="minimum">
-                    <number>-179</number>
-                   </property>
-                   <property name="maximum">
-                    <number>180</number>
-                   </property>
-                   <property name="orientation">
-                    <enum>Qt::Horizontal</enum>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QLabel" name="rdoutWristR">
-                   <property name="text">
-                    <string>0</string>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </item>
-              </layout>
-             </item>
-             <item>
-              <layout class="QVBoxLayout" name="verticalLayout_10">
-               <item>
-                <widget class="QLabel" name="MoveTimeLabel">
+                <widget class="QLabel" name="J1LabelS">
+                 <property name="minimumSize">
+                  <size>
+                   <width>150</width>
+                   <height>0</height>
+                  </size>
+                 </property>
                  <property name="text">
-                  <string>MoveTime</string>
+                  <string>Joint1</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
                  </property>
                 </widget>
                </item>
                <item>
-                <widget class="QSlider" name="sldrMoveTime">
-                 <property name="maximum">
-                  <number>100</number>
+                <widget class="QSlider" name="sldrJ1">
+                 <property name="minimum">
+                  <number>-179</number>
                  </property>
-                 <property name="value">
-                  <number>30</number>
+                 <property name="maximum">
+                  <number>180</number>
                  </property>
                  <property name="orientation">
-                  <enum>Qt::Vertical</enum>
+                  <enum>Qt::Horizontal</enum>
                  </property>
                 </widget>
                </item>
                <item>
-                <widget class="QLabel" name="rdoutMoveTime">
+                <widget class="QLabel" name="rdoutJ1">
+                 <property name="minimumSize">
+                  <size>
+                   <width>30</width>
+                   <height>0</height>
+                  </size>
+                 </property>
                  <property name="text">
                   <string>0</string>
                  </property>
@@ -1032,32 +837,228 @@
               </layout>
              </item>
              <item>
-              <layout class="QVBoxLayout" name="verticalLayout_7">
+              <layout class="QHBoxLayout" name="Joint2Slider">
                <item>
-                <widget class="QLabel" name="AccelTimeLabel">
+                <widget class="QLabel" name="J2LabelS">
+                 <property name="minimumSize">
+                  <size>
+                   <width>150</width>
+                   <height>0</height>
+                  </size>
+                 </property>
                  <property name="text">
-                  <string>AccelTime</string>
+                  <string>Joint2</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
                  </property>
                 </widget>
                </item>
                <item>
-                <widget class="QSlider" name="sldrAccelTime">
+                <widget class="QSlider" name="sldrJ2">
+                 <property name="minimum">
+                  <number>-179</number>
+                 </property>
                  <property name="maximum">
-                  <number>100</number>
-                 </property>
-                 <property name="value">
-                  <number>20</number>
-                 </property>
-                 <property name="sliderPosition">
-                  <number>20</number>
+                  <number>180</number>
                  </property>
                  <property name="orientation">
-                  <enum>Qt::Vertical</enum>
+                  <enum>Qt::Horizontal</enum>
                  </property>
                 </widget>
                </item>
                <item>
-                <widget class="QLabel" name="rdoutAccelTime">
+                <widget class="QLabel" name="rdoutJ2">
+                 <property name="minimumSize">
+                  <size>
+                   <width>30</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>0</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="Joint3Slider">
+               <item>
+                <widget class="QLabel" name="J3LabelS">
+                 <property name="minimumSize">
+                  <size>
+                   <width>150</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>Joint3</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QSlider" name="sldrJ3">
+                 <property name="minimum">
+                  <number>-179</number>
+                 </property>
+                 <property name="maximum">
+                  <number>180</number>
+                 </property>
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="rdoutJ3">
+                 <property name="minimumSize">
+                  <size>
+                   <width>30</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>0</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="Joint4Slider">
+               <item>
+                <widget class="QLabel" name="J4Labels">
+                 <property name="minimumSize">
+                  <size>
+                   <width>150</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>Joint4</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QSlider" name="sldrJ4">
+                 <property name="minimum">
+                  <number>-179</number>
+                 </property>
+                 <property name="maximum">
+                  <number>180</number>
+                 </property>
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="rdoutJ4">
+                 <property name="minimumSize">
+                  <size>
+                   <width>30</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>0</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="Joint5Slider">
+               <item>
+                <widget class="QLabel" name="J5LabelS">
+                 <property name="minimumSize">
+                  <size>
+                   <width>150</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>Joint5</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QSlider" name="sldrJ5">
+                 <property name="minimum">
+                  <number>-179</number>
+                 </property>
+                 <property name="maximum">
+                  <number>180</number>
+                 </property>
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="rdoutJ5">
+                 <property name="minimumSize">
+                  <size>
+                   <width>30</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>0</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="Joint6Slider">
+               <item>
+                <widget class="QLabel" name="J6LabelS">
+                 <property name="minimumSize">
+                  <size>
+                   <width>150</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>Joint6</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QSlider" name="sldrJ6">
+                 <property name="minimum">
+                  <number>-179</number>
+                 </property>
+                 <property name="maximum">
+                  <number>180</number>
+                 </property>
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="rdoutJ6">
+                 <property name="minimumSize">
+                  <size>
+                   <width>30</width>
+                   <height>0</height>
+                  </size>
+                 </property>
                  <property name="text">
                   <string>0</string>
                  </property>
@@ -1068,13 +1069,87 @@
             </layout>
            </item>
            <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_10"/>
+            <layout class="QVBoxLayout" name="MoveTime">
+             <item>
+              <widget class="QLabel" name="MoveTimeLabel">
+               <property name="text">
+                <string>MoveTime</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QSlider" name="sldrMoveTime">
+               <property name="maximum">
+                <number>100</number>
+               </property>
+               <property name="value">
+                <number>30</number>
+               </property>
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="rdoutMoveTime">
+               <property name="text">
+                <string>0</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QVBoxLayout" name="AccelTime">
+             <property name="sizeConstraint">
+              <enum>QLayout::SetFixedSize</enum>
+             </property>
+             <item>
+              <widget class="QLabel" name="AccelTimeLabel">
+               <property name="text">
+                <string>AccelTime</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QSlider" name="sldrAccelTime">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Maximum" vsizetype="Expanding">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="maximum">
+                <number>100</number>
+               </property>
+               <property name="value">
+                <number>20</number>
+               </property>
+               <property name="sliderPosition">
+                <number>20</number>
+               </property>
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="rdoutAccelTime">
+               <property name="text">
+                <string>0</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </item>
           </layout>
          </widget>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_14">
+         <layout class="QHBoxLayout" name="StatusBar">
           <item>
            <widget class="QLabel" name="label_3">
             <property name="maximumSize">
@@ -1114,7 +1189,7 @@
        </layout>
       </item>
       <item>
-       <layout class="QVBoxLayout" name="verticalLayout_11">
+       <layout class="QVBoxLayout" name="RightSideButtons">
         <item>
          <widget class="QPushButton" name="btn_estop">
           <property name="font">
@@ -1288,7 +1363,6 @@
     </item>
    </layout>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <resources/>
  <connections/>
