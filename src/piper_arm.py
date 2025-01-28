@@ -1,89 +1,82 @@
-import rclpy
-from rclpy.node import Node
+import logging
 from PyQt5.QtCore import QThread, pyqtSignal
-from sensor_msgs.msg import JointState
-from geometry_msgs.msg import Pose
 from piper_sdk import *
 import numpy as np
 from scipy.spatial.transform import Rotation as R
 import math, time
 
-class PiperArm(Node):
-    def __init__(self):
-        """!
-        Initializes the PiperArm class using Piper SDK.
-        """
-        super().__init__('piper_arm_node')
-        self.num_joints = 6         # gripper not included
-        self.piper = C_PiperInterface(can_name='can0')
-        self.piper.ConnectPort()
+logger = logging.getLogger(__name__)
 
-        # Publishers
-        self.joint_state_pub = self.create_publisher(JointState, 'joint_states', 10)
-        self.ee_pose_pub = self.create_publisher(Pose, 'ee_pose', 10)
+class PiperArm(C_PiperInterface):
+    def __init__(self, can_name='can0'):
+        """Initializes the PiperArm class using the Piper SDK."""
+        super().__init__(can_name=can_name)  # Initialize the C_PiperInterface part
 
-        # Joint state information
-        self.joint_state = JointState()
-        self.joint_state.name = [f'joint{i}' for i in range(self.num_joints)]
-        self.joint_state.position = [0.0] * self.num_joints
+        self.num_joints = 6  # Number of joints (gripper not included)
+        self.ConnectPort()  # Initialize CAN port
 
-        # Control Station
         self.speed_rate = 20  # percentage 
-        
         self.initialized = False
 
     def initialize(self):
-        """ Initializes the Piper arm. """
-        self.piper.EnableArm(7)
-        time.sleep(0.1)
-        if not self.enable_arm():
-            raise RuntimeError("Failed to enable arm.")
-        self.gripper_open()  # Release gripper
-        # self.set_positions([0.0] * self.num_joints)  # Reset all joints to initial position
-        self.initialized = True
-        self.get_logger().info("Piper Arm initialized and reset to initial position.")
+        """Initializes the Piper arm."""
+        is_enabled = self.enable_fun(True)  # Enable all motors
+        self.gripper_open()  
+        if is_enabled:
+            self.initialized = True
+            logger.info("The Piper arm is enabled!")
+        else:
+            logger.error("The Piper arm failed to be enabled!")
 
-    def enable_arm(self):
+    def enable_fun(self, enable:bool):
         enable_flag = False
+        loop_flag = False
         timeout = 5
         start_time = time.time()
-        while not enable_flag:
+        while not (loop_flag):
             elapsed_time = time.time() - start_time
-            enable_flag = all([
-                self.piper.GetArmLowSpdInfoMsgs().motor_1.foc_status.driver_enable_status,
-                self.piper.GetArmLowSpdInfoMsgs().motor_2.foc_status.driver_enable_status,
-                self.piper.GetArmLowSpdInfoMsgs().motor_3.foc_status.driver_enable_status,
-                self.piper.GetArmLowSpdInfoMsgs().motor_4.foc_status.driver_enable_status,
-                self.piper.GetArmLowSpdInfoMsgs().motor_5.foc_status.driver_enable_status,
-                self.piper.GetArmLowSpdInfoMsgs().motor_6.foc_status.driver_enable_status,
-            ])
-            if enable_flag:
-                self.get_logger().info("All motors enabled.")
-            elif elapsed_time > timeout:
-                self.get_logger().error("Motor enable timeout.")
-                return False
-            time.sleep(1)
-        return True
+            enable_list = []
+            enable_list.append(self.GetArmLowSpdInfoMsgs().motor_1.foc_status.driver_enable_status)
+            enable_list.append(self.GetArmLowSpdInfoMsgs().motor_2.foc_status.driver_enable_status)
+            enable_list.append(self.GetArmLowSpdInfoMsgs().motor_3.foc_status.driver_enable_status)
+            enable_list.append(self.GetArmLowSpdInfoMsgs().motor_4.foc_status.driver_enable_status)
+            enable_list.append(self.GetArmLowSpdInfoMsgs().motor_5.foc_status.driver_enable_status)
+            enable_list.append(self.GetArmLowSpdInfoMsgs().motor_6.foc_status.driver_enable_status)
+            if(enable):
+                enable_flag = all(enable_list)
+                self.EnableArm(7)
+                self.GripperCtrl(0,1000,0x01, 0)
+            else:
+                enable_flag = any(enable_list)
+                self.DisableArm(7)
+                self.GripperCtrl(0,1000,0x00, 0)
+            if(enable_flag == enable):  # Success, break while loop
+                loop_flag = True
+                enable_flag = True
+            else:                       # Fail, re-try
+                loop_flag = False       
+                enable_flag = False
+            if elapsed_time > timeout:
+                enable_flag = False
+                loop_flag = True
+                break
+            time.sleep(0.5)
+        response = enable_flag
+        return response
 
-    def disable(self):
-        """ Disables the Piper arm. """
-        self.piper.DisableArm(7)
-        self.initialized = False
-        self.get_logger().info("Piper Arm disabled.")
-
-    def gripper_open(self):
+    def gripper_open(self,):
         """ Opens the gripper to its maximum extent. """
         gripper_angle = 80 # degree
-        self.piper.GripperCtrl(gripper_angle*1000, gripper_effort=800, gripper_code=0x01, set_zero=0)
+        self.GripperCtrl(gripper_angle*1000, gripper_effort=800, gripper_code=0x01, set_zero=0)
         self.wait_for_motion_complete()
-        self.get_logger().info("Gripper opened.")
+        logger.info("Gripper opened.")
 
     def gripper_close(self):
         """ Closes the gripper with specified effort. """
         gripper_angle = 10
-        self.piper.GripperCtrl(gripper_angle*1000, gripper_effort=800, gripper_code=0x01, set_zero=0)
+        self.GripperCtrl(gripper_angle*1000, gripper_effort=800, gripper_code=0x01, set_zero=0)
         self.wait_for_motion_complete()
-        self.get_logger().info(f"Gripper closed.")
+        logger.info("Gripper closed.")
 
     def set_positions(self, joint_positions):
         """ Sets joint positions. 
@@ -92,38 +85,9 @@ class PiperArm(Node):
             so when we set position, we set angle in radians
         """
         joint_positions = [int(pos * 180 / math.pi * 1000) for pos in joint_positions]
-        self.piper.JointCtrl(*joint_positions)
-        self.get_logger().info(f"Set positions: {joint_positions}")
+        self.JointCtrl(*joint_positions)
+        logger.info(f"Set positions: {joint_positions}")
         self.wait_for_motion_complete()
-
-    def publish_joint_states(self):
-        """ Publishes joint states. """
-        self.joint_state.header.stamp = self.get_clock().now().to_msg()
-        self.joint_state.position = [
-            self.piper.GetArmJointMsgs().joint_state.joint_1 / 1000.0,
-            self.piper.GetArmJointMsgs().joint_state.joint_2 / 1000.0,
-            self.piper.GetArmJointMsgs().joint_state.joint_3 / 1000.0,
-            self.piper.GetArmJointMsgs().joint_state.joint_4 / 1000.0,
-            self.piper.GetArmJointMsgs().joint_state.joint_5 / 1000.0,
-            self.piper.GetArmJointMsgs().joint_state.joint_6 / 1000.0,
-        ]
-        self.joint_state_pub.publish(self.joint_state)
-
-    def publish_ee_pose(self):
-        """ Publishes end-effector pose. """
-        pose = Pose()
-        end_pose = self.piper.GetArmEndPoseMsgs().end_pose
-        pose.position.x = end_pose.X_axis / 1000000
-        pose.position.y = end_pose.Y_axis / 1000000
-        pose.position.z = end_pose.Z_axis / 1000000
-
-        roll = math.radians(end_pose.RX_axis / 1000)
-        pitch = math.radians(end_pose.RY_axis / 1000)
-        yaw = math.radians(end_pose.RZ_axis / 1000)
-        quaternion = R.from_euler('xyz', [roll, pitch, yaw]).as_quat()
-        pose.orientation.x, pose.orientation.y, pose.orientation.z, pose.orientation.w = quaternion
-
-        self.ee_pose_pub.publish(pose)
 
     def wait_for_motion_complete(self, timeout=10):
         """ Waits until the arm completes its current motion or the timeout is reached. """
@@ -131,12 +95,12 @@ class PiperArm(Node):
         start_time = time.time()
         while True:
             elapsed_time = time.time() - start_time
-            motion_status = self.piper.GetArmStatus().arm_status.motion_status
-            if motion_status == 0:  # Assuming 0 means motion complete
-                # self.get_logger().info("Motion completed.")
+            motion_status = self.GetArmStatus().arm_status.motion_status
+            if motion_status == 0:  #  Motion complete
+                #logger.info("Motion completed.")
                 return True
             if elapsed_time > timeout:
-                self.get_logger().error("Motion timeout.")
+                logger.error("Motion timeout.")
                 return False
             time.sleep(0.1)  # Avoid busy-waiting
 
@@ -147,53 +111,42 @@ class PiperArmThread(QThread):
 
     def __init__(self, piper_arm, parent=None):
         super().__init__(parent=parent)
-        self.piper_arm = piper_arm
-        self.node = rclpy.create_node('piper_arm_thread')
-        self.executor = rclpy.executors.SingleThreadedExecutor()
-        self.executor.add_node(self.node)
+        self.arm = piper_arm
 
     def run(self):
-        """ Spins the executor for handling callbacks. """
-        try:
-            while rclpy.ok():
-                self.piper_arm.publish_joint_states()
-                self.piper_arm.publish_ee_pose()
-                self.executor.spin_once(timeout_sec=0.02)
-        finally:
-            self.node.destroy_node()
-            rclpy.shutdown()
-
-    def callback(self, data):
-        positions = [p / 1000.0 for p in self.piper_arm.joint_state.position]
-        self.updateJointReadout.emit(positions)
-        ee_pose = self.piper_arm.publish_ee_pose()
-        self.updateEndEffectorReadout.emit([ee_pose.position.x, ee_pose.position.y, ee_pose.position.z])
+        #TODO
+        while True:
+            joint_poses = self.arm.GetArmJointMsgs()
+            ee_pose = self.arm.GetArmEndPoseMsgs()
+            self.updateJointReadout.emit()
+            self.updateEndEffectorReadout.emit([ee_pose.position.x, ee_pose.position.y, ee_pose.position.z])
 
 if __name__ == '__main__':
-    rclpy.init()
+    # Configure logging only if run standalone
+    if not logging.getLogger().hasHandlers():
+        logging.basicConfig(
+            level=logging.INFO,
+            format="%(asctime)s - %(levelname)s - %(message)s",
+        )
     arm = PiperArm()
-    arm_thread = PiperArmThread(arm)
-    arm_thread.start()
+    # arm_thread = PiperArmThread(arm)
+    # arm_thread.start()
     try:
-        arm.piper.MotionCtrl_2(0x01, 0x01, 20, 0x00)
+        arm.MotionCtrl_2(0x01, 0x01, 20, 0x00)
         arm.initialize()
 
-        arm.piper.MotionCtrl_2(0x01, 0x01, 20, 0x00)
+        arm.MotionCtrl_2(0x01, 0x01, 20, 0x00)
         arm.set_positions([0, 1, -1.57, 0, 0, 1])
         arm.gripper_close()
 
-        arm.piper.MotionCtrl_2(0x01, 0x01, 20, 0x00)
+        arm.MotionCtrl_2(0x01, 0x01, 20, 0x00)
         arm.set_positions([0, 0, 0, 0, 0.39, 0])
         arm.gripper_open()
-
-        rclpy.spin(arm)
     except KeyboardInterrupt:
         print("\nKeyboardInterrupt detected. Exiting...")
     finally:
         print("Shutting down...")
-        arm.disable()  # Disable the arm
-        arm_thread.quit()  # Signal the thread to stop
-        arm_thread.wait()  # Wait for the thread to terminate
-        if rclpy.ok():  # Check if the context is still valid
-            rclpy.shutdown()  # Shutdown ROS2
+        arm.enable_fun(False)  # Disable the arm
+        # arm_thread.quit()  # Signal the thread to stop
+        # arm_thread.wait()  # Wait for the thread to terminate
         print("Clean exit.")

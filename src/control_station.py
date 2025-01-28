@@ -2,7 +2,7 @@
 """!
 Main GUI for Arm lab
 """
-import sys
+import sys, logging
 import numpy as np
 from functools import partial
 from PyQt5.QtCore import QThread, Qt, pyqtSlot
@@ -17,6 +17,14 @@ from state_machine import StateMachine, StateMachineThread
 D2R = np.pi / 180.0
 R2D = 180.0 / np.pi
 
+logging.basicConfig(
+    level=logging.INFO,  # Set the log level
+    format="%(asctime)s - %(levelname)s - %(message)s",  # Log format
+    handlers=[
+        logging.StreamHandler(),  # Log to terminal
+        logging.FileHandler("control_station.log"),  # Log to a file
+    ]
+)
 
 class Gui(QMainWindow):
     """!
@@ -56,9 +64,9 @@ class Gui(QMainWindow):
         """Objects Using Other Classes"""
         self.camera = Camera()
         print("Creating piper arm...")
-        self.piper = PiperArm()
+        self.arm = PiperArm()     # This is the entry point where arm instance is created  
         print("Done creating piper arm instance.")
-        self.sm = StateMachine(self.piper, self.camera)
+        self.sm = StateMachine(self.arm, self.camera)
         """
         Attach Functions to Buttons & Sliders
         """
@@ -68,11 +76,10 @@ class Gui(QMainWindow):
         self.ui.videoDisplay.mousePressEvent = self.calibrateMousePress
 
         # Buttons
-        # Handy lambda function falsethat can be used with Partial to only set the new state if the rxarm is initialized
-        #nxt_if_arm_init = lambda next_state: self.sm.set_next_state(next_state if self.rxarm.initialized else None)
         nxt_if_arm_init = lambda next_state: self.sm.set_next_state(next_state)
+
         self.ui.btn_estop.clicked.connect(self.estop)
-        self.ui.btn_init_arm.clicked.connect(self.initRxarm)
+        self.ui.btn_init_arm.clicked.connect(self.initArm)
         self.ui.btn_torq_off.clicked.connect(
             lambda: self.rxarm.disable_torque())
         self.ui.btn_torq_on.clicked.connect(lambda: self.rxarm.enable_torque())
@@ -160,7 +167,7 @@ class Gui(QMainWindow):
     """ Other callback functions attached to GUI elements"""
 
     def estop(self):
-        self.rxarm.disable_torque()
+        # TODO: decide what is estop
         self.sm.set_next_state('estop')
 
     def sliderChange(self):
@@ -236,13 +243,12 @@ class Gui(QMainWindow):
         self.camera.last_click[1] = pt.y()
         self.camera.new_click = True
 
-    def initRxarm(self):
+    def initArm(self):
         """!
         @brief      Initializes the rxarm.
         """
         self.ui.SliderFrame.setEnabled(False)
         self.ui.chk_directcontrol.setChecked(False)
-        self.rxarm.enable_torque()
         self.sm.set_next_state('initialize_rxarm')
 
 def main():
