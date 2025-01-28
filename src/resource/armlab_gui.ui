@@ -1069,77 +1069,58 @@
             </layout>
            </item>
            <item>
-            <layout class="QVBoxLayout" name="MoveTime">
+            <layout class="QVBoxLayout" name="SpeedSlider">
              <item>
-              <widget class="QLabel" name="MoveTimeLabel">
+              <widget class="QLabel" name="speedLabel">
                <property name="text">
-                <string>MoveTime</string>
+                <string>Speed (%)</string>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QSlider" name="sldrMoveTime">
-               <property name="maximum">
-                <number>100</number>
-               </property>
-               <property name="value">
-                <number>30</number>
-               </property>
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="rdoutMoveTime">
-               <property name="text">
-                <string>0</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-           <item>
-            <layout class="QVBoxLayout" name="AccelTime">
-             <property name="sizeConstraint">
-              <enum>QLayout::SetFixedSize</enum>
-             </property>
-             <item>
-              <widget class="QLabel" name="AccelTimeLabel">
-               <property name="text">
-                <string>AccelTime</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QSlider" name="sldrAccelTime">
-               <property name="enabled">
-                <bool>false</bool>
-               </property>
+              <widget class="QSlider" name="sldrSpeed">
                <property name="sizePolicy">
-                <sizepolicy hsizetype="Maximum" vsizetype="Expanding">
+                <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
+               <property name="minimumSize">
+                <size>
+                 <width>55</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="layoutDirection">
+                <enum>Qt::LeftToRight</enum>
+               </property>
                <property name="maximum">
                 <number>100</number>
                </property>
                <property name="value">
-                <number>20</number>
-               </property>
-               <property name="sliderPosition">
-                <number>20</number>
+                <number>0</number>
                </property>
                <property name="orientation">
                 <enum>Qt::Vertical</enum>
                </property>
+               <property name="tickPosition">
+                <enum>QSlider::NoTicks</enum>
+               </property>
               </widget>
              </item>
              <item>
-              <widget class="QLabel" name="rdoutAccelTime">
+              <widget class="QLabel" name="rdoutSpeed">
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>0</height>
+                </size>
+               </property>
                <property name="text">
                 <string>0</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
                </property>
               </widget>
              </item>

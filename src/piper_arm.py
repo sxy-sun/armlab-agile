@@ -27,6 +27,9 @@ class PiperArm(Node):
         self.joint_state.name = [f'joint{i}' for i in range(self.num_joints)]
         self.joint_state.position = [0.0] * self.num_joints
 
+        # Control Station
+        self.speed_rate = 20  # percentage 
+        
         self.initialized = False
 
     def initialize(self):

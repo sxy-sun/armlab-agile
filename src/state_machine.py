@@ -13,7 +13,7 @@ class StateMachine():
                 TODO: Add states and state functions to this class to implement all of the required logic for the armlab
     """
 
-    def __init__(self, rxarm, camera):
+    def __init__(self, piper_arm, camera):
         """!
         @brief      Constructs a new instance.
 
@@ -21,7 +21,7 @@ class StateMachine():
         @param      planner  The planner
         @param      camera   The camera
         """
-        self.rxarm = rxarm
+        self.arm = piper_arm
         self.camera = camera
         self.status_message = "State: Idle"
         self.current_state = "idle"
@@ -60,8 +60,8 @@ class StateMachine():
         # IMPORTANT: This function runs in a loop. If you make a new state, it will be run every iteration.
         #            The function (and the state functions within) will continuously be called until the state changes.
 
-        if self.next_state == "initialize_rxarm":
-            self.initialize_rxarm()
+        if self.next_state == "initialize_arm":
+            self.initialize_arm()
 
         if self.next_state == "idle":
             self.idle()
@@ -132,16 +132,16 @@ class StateMachine():
         """
         time.sleep(1)
 
-    def initialize_rxarm(self):
+    def initialize_arm(self):
         """!
         @brief      Initializes the rxarm.
         """
-        self.current_state = "initialize_rxarm"
-        self.status_message = "RXArm Initialized!"
-        if not self.rxarm.initialize():
-            print('Failed to initialize the rxarm')
-            self.status_message = "State: Failed to initialize the rxarm!"
+        self.current_state = "initialize_arm"
+        self.status_message = "Piper Arm Initializing..."
+        if not self.arm.piper.initialize():
+            self.status_message = "State: Failed to initialize the piper arm!"
             time.sleep(5)
+        self.status_message = "Piper Arm Initialized"
         self.next_state = "idle"
 
 class StateMachineThread(QThread):
