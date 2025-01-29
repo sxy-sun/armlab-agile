@@ -135,7 +135,7 @@ class Gui(QMainWindow):
     @pyqtSlot(list)
     def updateJointReadout(self, joints):
         for rdout, joint in zip(self.joint_readouts, joints):
-            rdout.setText(str('%+.2f' % (joint * R2D)))
+            rdout.setText(str('%+.2f' % (joint)))
 
     # Distances should be in mm
     @pyqtSlot(list)
@@ -143,9 +143,9 @@ class Gui(QMainWindow):
         self.ui.rdoutX.setText(str("%+.2f mm" % (pos[0])))
         self.ui.rdoutY.setText(str("%+.2f mm" % (pos[1])))
         self.ui.rdoutZ.setText(str("%+.2f mm" % (pos[2])))
-        self.ui.rdoutPhi.setText(str("%+.2f rad" % (pos[3])))
-        self.ui.rdoutTheta.setText(str("%+.2f rad" % (pos[4])))
-        self.ui.rdoutPsi.setText(str("%+.2f rad" % (pos[5])))
+        self.ui.rdoutPhi.setText(str("%+.2f deg" % (pos[3])))
+        self.ui.rdoutTheta.setText(str("%+.2f deg" % (pos[4])))
+        self.ui.rdoutPsi.setText(str("%+.2f deg" % (pos[5])))
 
     @pyqtSlot(QImage, QImage, QImage, QImage)
     def setImage(self, rgb_image, depth_image, tag_image, grid_image):

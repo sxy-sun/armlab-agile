@@ -84,9 +84,9 @@ class PiperArm(C_PiperInterface):
             multiply 180/pi is from radians to degrees, 1000 is scaling factor.
             so when we set position, we set angle in radians
         """
+        logger.info(f"Set positions: {joint_positions}")
         joint_positions = [int(pos * 180 / math.pi * 1000) for pos in joint_positions]
         self.JointCtrl(*joint_positions)
-        logger.info(f"Set positions: {joint_positions}")
         self.wait_for_motion_complete()
 
     def wait_for_motion_complete(self, timeout=10):
@@ -103,6 +103,46 @@ class PiperArm(C_PiperInterface):
                 logger.error("Motion timeout.")
                 return False
             time.sleep(0.1)  # Avoid busy-waiting
+    
+    def get_joint_state(self):
+        joint_state = self.GetArmJointMsgs().joint_state
+        joint_state_lst = [
+            joint_state.joint_1,
+            joint_state.joint_2,
+            joint_state.joint_3,
+            joint_state.joint_4,
+            joint_state.joint_5,
+            joint_state.joint_6,
+        ]
+        return [round(j * 0.001, 3) for j in joint_state_lst]
+
+    def get_end_effector_pose(self):
+        """Forward Kinematics"""
+        end_effector_pose = self.GetArmEndPoseMsgs().end_pose
+        EE_pose_lst = [
+            end_effector_pose.X_axis,
+            end_effector_pose.Y_axis,
+            end_effector_pose.Z_axis,
+            end_effector_pose.RX_axis,
+            end_effector_pose.RY_axis,
+            end_effector_pose.RZ_axis,
+        ]
+        return [round(pose * 0.001, 3) for pose in EE_pose_lst]
+
+    def set_end_effector_post(self):
+        """Inverse Kinematics"""
+        # TODO
+        return 0
+
+    def estop(self):
+        self.MotionCtrl_1(0x01,0,0) # Emergency Stop
+        for i in range(10, 0, -1):
+            logger.warning(f"Arm reset in {i} seconds...Hold the arm!!!")
+            time.sleep(1)
+
+        # Reset
+        self.MotionCtrl_1(0x02,0,0)
+        self.MotionCtrl_2(0, 0, 0, 0x00)
 
 class PiperArmThread(QThread):
     """ Thread for running Piper Arm operations. """
@@ -112,14 +152,24 @@ class PiperArmThread(QThread):
     def __init__(self, piper_arm, parent=None):
         super().__init__(parent=parent)
         self.arm = piper_arm
+        self.is_running = False
 
     def run(self):
-        #TODO
-        while True:
-            joint_poses = self.arm.GetArmJointMsgs()
-            ee_pose = self.arm.GetArmEndPoseMsgs()
-            self.updateJointReadout.emit()
-            self.updateEndEffectorReadout.emit([ee_pose.position.x, ee_pose.position.y, ee_pose.position.z])
+        self.is_running = True
+        while self.is_running:
+            try:
+                joint_state = self.arm.get_joint_state()
+                ee_pose = self.arm.get_end_effector_pose()
+                self.updateJointReadout.emit(joint_state)
+                self.updateEndEffectorReadout.emit(ee_pose)
+                time.sleep(0.01)  # Reduce CPU usage
+            except Exception as e:
+                logger.error(f"Thread error: {e}")
+                break
+
+    def stop(self):
+        self.is_running = False  # Signal the loop to exit
+        self.wait()  # Wait for thread to finish
 
 if __name__ == '__main__':
     # Configure logging only if run standalone
@@ -129,8 +179,8 @@ if __name__ == '__main__':
             format="%(asctime)s - %(levelname)s - %(message)s",
         )
     arm = PiperArm()
-    # arm_thread = PiperArmThread(arm)
-    # arm_thread.start()
+    arm_thread = PiperArmThread(arm)
+    arm_thread.start()
     try:
         arm.MotionCtrl_2(0x01, 0x01, 20, 0x00)
         arm.initialize()
@@ -138,15 +188,16 @@ if __name__ == '__main__':
         arm.MotionCtrl_2(0x01, 0x01, 20, 0x00)
         arm.set_positions([0, 1, -1.57, 0, 0, 1])
         arm.gripper_close()
-
+        arm.bug() # trigger error on purpose
         arm.MotionCtrl_2(0x01, 0x01, 20, 0x00)
         arm.set_positions([0, 0, 0, 0, 0.39, 0])
         arm.gripper_open()
     except KeyboardInterrupt:
         print("\nKeyboardInterrupt detected. Exiting...")
+    except Exception as e:
+        logger.error(f"Critical error: {e}", exc_info=True)
     finally:
         print("Shutting down...")
-        arm.enable_fun(False)  # Disable the arm
-        # arm_thread.quit()  # Signal the thread to stop
-        # arm_thread.wait()  # Wait for the thread to terminate
+        arm.estop()
+        arm_thread.stop()  # Use custom stop method
         print("Clean exit.")
