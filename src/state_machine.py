@@ -17,8 +17,7 @@ class StateMachine():
         """!
         @brief      Constructs a new instance.
 
-        @param      rxarm   The rxarm
-        @param      planner  The planner
+        @param      piper_arm   The Piper arm
         @param      camera   The camera
         """
         self.arm = piper_arm
@@ -86,7 +85,7 @@ class StateMachine():
 
     def manual(self):
         """!
-        @brief      Manually control the rxarm
+        @brief      Manually control the arm
         """
         self.status_message = "State: Manual - Use sliders to control arm"
         self.current_state = "manual"
@@ -102,9 +101,9 @@ class StateMachine():
         """!
         @brief      Emergency stop disable torque.
         """
-        self.status_message = "EMERGENCY STOP - Check rxarm and restart program"
+        self.status_message = "EMERGENCY STOP! Arm fall in 10 seconds!"
         self.current_state = "estop"
-        self.rxarm.disable_torque()
+        self.arm.reset()
 
     def execute(self):
         """!
@@ -134,7 +133,7 @@ class StateMachine():
 
     def initialize_arm(self):
         """!
-        @brief      Initializes the rxarm.
+        @brief      Initializes the Piper Arm.
         """
         self.current_state = "initialize_arm"
         self.status_message = "Piper Arm Initializing..."

@@ -20,6 +20,7 @@ class PiperArm(C_PiperInterface):
 
     def initialize(self):
         """Initializes the Piper arm."""
+        self.MotionCtrl_2(0x01, 0x01, self.speed_rate, 0x00)
         is_enabled = self.enable_fun(True)  # Enable all motors
         self.gripper_open()  
         if is_enabled:
@@ -84,6 +85,7 @@ class PiperArm(C_PiperInterface):
             multiply 180/pi is from radians to degrees, 1000 is scaling factor.
             so when we set position, we set angle in radians
         """
+        self.MotionCtrl_2(0x01, 0x01, self.speed_rate, 0x00)
         logger.info(f"Set positions: {joint_positions}")
         joint_positions = [int(pos * 180 / math.pi * 1000) for pos in joint_positions]
         self.JointCtrl(*joint_positions)
@@ -139,10 +141,20 @@ class PiperArm(C_PiperInterface):
         for i in range(10, 0, -1):
             logger.warning(f"Arm reset in {i} seconds...Hold the arm!!!")
             time.sleep(1)
+        self.reset()
 
-        # Reset
+    def reset(self):
+        time.sleep(0.1)
         self.MotionCtrl_1(0x02,0,0)
         self.MotionCtrl_2(0, 0, 0, 0x00)
+
+    def sleep(self):
+        self.MotionCtrl_2(0x01, 0x01, self.speed_rate, 0x00)
+        self.set_positions([0, 0, 0, 0, 0.39, 0])
+        self.gripper_open()
+
+    def set_speed_rate(self, speed_rate):
+        self.speed_rate = speed_rate
 
 class PiperArmThread(QThread):
     """ Thread for running Piper Arm operations. """
@@ -172,32 +184,37 @@ class PiperArmThread(QThread):
         self.wait()  # Wait for thread to finish
 
 if __name__ == '__main__':
-    # Configure logging only if run standalone
-    if not logging.getLogger().hasHandlers():
-        logging.basicConfig(
-            level=logging.INFO,
-            format="%(asctime)s - %(levelname)s - %(message)s",
-        )
+    logging.basicConfig(
+        level=logging.INFO,  # Change to DEBUG if needed
+        format="%(asctime)s - %(levelname)s - %(message)s",
+        handlers=[
+            logging.StreamHandler(),  # Ensure logging prints to console
+            logging.FileHandler("piper_arm.log", mode='w')  # Optional: Log to file
+        ]
+    )
+
+    logger.setLevel(logging.DEBUG)  # Set a global logging level
+
     arm = PiperArm()
     arm_thread = PiperArmThread(arm)
     arm_thread.start()
     try:
-        arm.MotionCtrl_2(0x01, 0x01, 20, 0x00)
         arm.initialize()
-
-        arm.MotionCtrl_2(0x01, 0x01, 20, 0x00)
         arm.set_positions([0, 1, -1.57, 0, 0, 1])
         arm.gripper_close()
-        arm.bug() # trigger error on purpose
-        arm.MotionCtrl_2(0x01, 0x01, 20, 0x00)
-        arm.set_positions([0, 0, 0, 0, 0.39, 0])
-        arm.gripper_open()
+        arm.sleep()
+
     except KeyboardInterrupt:
         print("\nKeyboardInterrupt detected. Exiting...")
+        arm.estop()
     except Exception as e:
         logger.error(f"Critical error: {e}", exc_info=True)
+        arm.estop()
     finally:
         print("Shutting down...")
-        arm.estop()
+        print("Torque off in 3 seconds...")
+        time.sleep(3)
+        arm.enable_fun(False)
+        arm.reset()
         arm_thread.stop()  # Use custom stop method
         print("Clean exit.")

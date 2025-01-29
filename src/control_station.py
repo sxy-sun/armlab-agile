@@ -78,29 +78,29 @@ class Gui(QMainWindow):
         # Buttons
         nxt_if_arm_init = lambda next_state: self.sm.set_next_state(next_state)
 
-        self.ui.btn_estop.clicked.connect(self.estop)
+        self.ui.btn_estop.clicked.connect(partial(nxt_if_arm_init, 'estop'))
         self.ui.btn_init_arm.clicked.connect(self.initArm)
-        self.ui.btn_torq_off.clicked.connect(
-            lambda: self.rxarm.disable_torque())
-        self.ui.btn_torq_on.clicked.connect(lambda: self.rxarm.enable_torque())
-        self.ui.btn_sleep_arm.clicked.connect(lambda: self.rxarm.sleep())
+        # (Dev) TODO: Replace torq_off with something safer
+        # self.ui.btn_torq_off.clicked.connect(
+        #     lambda: self.rxarm.disable_torque())
+        self.ui.btn_torq_on.clicked.connect(lambda: self.arm.enable_fun(True))
+        self.ui.btn_sleep_arm.clicked.connect(lambda: self.arm.sleep())
         self.ui.btn_calibrate.clicked.connect(partial(nxt_if_arm_init, 'calibrate'))
 
         # User Buttons
-        # TODO: Add more lines here to add more buttons
+        # (Student) TODO: Add more lines here to add more buttons
         # To make a button activate a state, copy the lines for btnUser3 but change 'execute' to whichever state you want
         self.ui.btnUser1.setText('Open Gripper')
-        self.ui.btnUser1.clicked.connect(lambda: self.rxarm.gripper.release())
+        self.ui.btnUser1.clicked.connect(lambda: self.arm.gripper_open())
         self.ui.btnUser2.setText('Close Gripper')
-        self.ui.btnUser2.clicked.connect(lambda: self.rxarm.gripper.grasp())
+        self.ui.btnUser2.clicked.connect(lambda: self.arm.gripper_close)
         self.ui.btnUser3.setText('Execute')
         self.ui.btnUser3.clicked.connect(partial(nxt_if_arm_init, 'execute'))
 
         # Sliders
         for sldr in self.joint_sliders:
             sldr.valueChanged.connect(self.sliderChange)
-        self.ui.sldrMoveTime.valueChanged.connect(self.sliderChange)
-        self.ui.sldrAccelTime.valueChanged.connect(self.sliderChange)
+        self.ui.sldrSpeed.valueChanged.connect(self.sliderChange)
         
         # Direct Control
         self.ui.chk_directcontrol.stateChanged.connect(self.directControlChk)
@@ -120,7 +120,7 @@ class Gui(QMainWindow):
         self.VideoThread = VideoThread(self.camera)
         self.VideoThread.updateFrame.connect(self.setImage)
         self.VideoThread.start()
-        self.ArmThread = RXArmThread(self.rxarm)
+        self.ArmThread = PiperArmThread(self.arm)
         self.ArmThread.updateJointReadout.connect(self.updateJointReadout)
         self.ArmThread.updateEndEffectorReadout.connect(
             self.updateEndEffectorReadout)
@@ -165,11 +165,6 @@ class Gui(QMainWindow):
             self.ui.videoDisplay.setPixmap(QPixmap.fromImage(grid_image))
 
     """ Other callback functions attached to GUI elements"""
-
-    def estop(self):
-        # TODO: decide what is estop
-        self.sm.set_next_state('estop')
-
     def sliderChange(self):
         """!
         @brief Slider changed
@@ -179,29 +174,25 @@ class Gui(QMainWindow):
         for rdout, sldr in zip(self.joint_slider_rdouts, self.joint_sliders):
             rdout.setText(str(sldr.value()))
 
-        self.ui.rdoutMoveTime.setText(
-            str(self.ui.sldrMoveTime.value() / 10.0) + "s")
-        self.ui.rdoutAccelTime.setText(
-            str(self.ui.sldrAccelTime.value() / 20.0) + "s")
-        self.rxarm.set_moving_time(self.ui.sldrMoveTime.value() / 10.0)
-        self.rxarm.set_accel_time(self.ui.sldrAccelTime.value() / 20.0)
+        self.ui.rdoutSpeed.setText(
+            str(self.ui.sldrSpeed.value()))
+        self.arm.set_speed_rate(self.ui.sldrSpeed.value())
 
-        # Do nothing if the rxarm is not initialized
-        if self.rxarm.initialized:
+        # Do nothing if the arm is not initialized
+        if self.arm.initialized:
             joint_positions = np.array(
-                [sldr.value() * D2R for sldr in self.joint_sliders])
-            # Only send the joints that the rxarm has
-            self.rxarm.set_positions(joint_positions[0:self.rxarm.num_joints])
+                [sldr.value() for sldr in self.joint_sliders])
+            self.arm.set_positions(joint_positions[0:self.arm.num_joints])
 
     def directControlChk(self, state):
         """!
         @brief      Changes to direct control mode
 
-                    Will only work if the rxarm is initialized.
+                    Will only work if the arm is initialized.
 
         @param      state  State of the checkbox
         """
-        if state == Qt.Checked and self.rxarm.initialized:
+        if state == Qt.Checked and self.arm.initialized:
             # Go to manual and enable sliders
             self.sm.set_next_state("manual")
             self.ui.SliderFrame.setEnabled(True)
