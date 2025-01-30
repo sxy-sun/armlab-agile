@@ -5,9 +5,9 @@ Main GUI for Arm lab
 import sys, logging
 import numpy as np
 from functools import partial
-from PyQt5.QtCore import QThread, Qt, pyqtSlot
-from PyQt5.QtGui import QPixmap, QImage
-from PyQt5.QtWidgets import QApplication, QWidget, QMainWindow
+from PyQt5.QtCore import QThread, Qt, pyqtSlot 
+from PyQt5.QtGui import QPixmap, QImage 
+from PyQt5.QtWidgets import QApplication, QWidget, QMainWindow, QMessageBox
 from resource.ui import Ui_MainWindow
 from piper_arm import PiperArm, PiperArmThread
 from camera import Camera, VideoThread
@@ -82,20 +82,18 @@ class Gui(QMainWindow):
 
         self.ui.btn_estop.clicked.connect(partial(nxt_if_arm_init, 'estop'))
         self.ui.btn_init_arm.clicked.connect(self.initArm)
-        # (Dev) TODO: Replace torq_off with something safer
-        # self.ui.btn_torq_off.clicked.connect(
-        #     lambda: self.rxarm.disable_torque())
+        self.ui.btn_torq_off.clicked.connect(self.btn_torq_off_clicked)
         self.ui.btn_torq_on.clicked.connect(lambda: self.arm.enable_fun(True))
-        self.ui.btn_sleep_arm.clicked.connect(lambda: self.arm.sleep())
+        self.ui.btn_sleep_arm.clicked.connect(self.arm.sleep)
         self.ui.btn_calibrate.clicked.connect(partial(nxt_if_arm_init, 'calibrate'))
 
         # User Buttons
         # (Student) TODO: Add more lines here to add more buttons
         # To make a button activate a state, copy the lines for btnUser3 but change 'execute' to whichever state you want
         self.ui.btnUser1.setText('Open Gripper')
-        self.ui.btnUser1.clicked.connect(lambda: self.arm.gripper_open())
+        self.ui.btnUser1.clicked.connect(self.arm.gripper_open)
         self.ui.btnUser2.setText('Close Gripper')
-        self.ui.btnUser2.clicked.connect(lambda: self.arm.gripper_close())
+        self.ui.btnUser2.clicked.connect(self.arm.gripper_close)
         self.ui.btnUser3.setText('Execute')
         self.ui.btnUser3.clicked.connect(partial(nxt_if_arm_init, 'execute'))
 
@@ -197,6 +195,7 @@ class Gui(QMainWindow):
         if state == Qt.Checked and self.arm.initialized:
             # Go to manual and enable sliders
             self.sm.set_next_state("manual")
+            self.arm.sleep()
             self.ui.SliderFrame.setEnabled(True)
         else:
             # Lock sliders and go to idle
@@ -244,6 +243,25 @@ class Gui(QMainWindow):
         self.ui.chk_directcontrol.setChecked(False)
         self.sm.set_next_state('initialize_arm')
 
+    def btn_torq_off_clicked(self):
+        """Show confirmation dialog before disabling torque"""
+        msg_box = QMessageBox()
+        msg_box.setWindowTitle("Warning")
+        msg_box.setIcon(QMessageBox.Warning)
+        msg_box.setText("<span style='color: red; font-weight: bold;'>The robot arm will lose torque.</span>")
+        msg_box.setInformativeText("Make sure it is in sleep position, or hold it by hand to avoid damage.")
+        
+        # Add custom buttons
+        torque_off_btn = msg_box.addButton("Torque Off", QMessageBox.DestructiveRole)
+        cancel_btn = msg_box.addButton("Cancel", QMessageBox.RejectRole)
+        
+        msg_box.setDefaultButton(cancel_btn)
+        
+        ret = msg_box.exec_()
+        
+        if msg_box.clickedButton() == torque_off_btn:
+            self.arm.enable_fun(False)
+            
 def main():
     """!
     @brief      Starts the GUI

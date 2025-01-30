@@ -104,6 +104,7 @@ class StateMachine():
         self.status_message = "EMERGENCY STOP! Arm fall in 10 seconds!"
         self.current_state = "estop"
         self.arm.estop()
+        self.next_state = "idle"
 
     def execute(self):
         """!
