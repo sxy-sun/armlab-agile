@@ -22,12 +22,13 @@ class PiperArm(C_PiperInterface):
         """Initializes the Piper arm."""
         self.MotionCtrl_2(0x01, 0x01, self.speed_rate, 0x00)
         is_enabled = self.enable_fun(True)  # Enable all motors
-        self.gripper_open()  
         if is_enabled:
             self.initialized = True
             logger.info("The Piper arm is enabled!")
         else:
             logger.error("The Piper arm failed to be enabled!")
+        self.set_positions([0, 90, -90, 0, 0, 0])
+        self.gripper_open()  
 
     def enable_fun(self, enable:bool):
         enable_flag = False
@@ -151,7 +152,6 @@ class PiperArm(C_PiperInterface):
     def sleep(self):
         self.MotionCtrl_2(0x01, 0x01, self.speed_rate, 0x00)
         self.set_positions([0, 0, 0, 0, 23, 0])
-        self.gripper_open()
 
     def set_speed_rate(self, speed_rate):
         self.speed_rate = speed_rate
