@@ -132,9 +132,10 @@ class PiperArm(C_PiperInterface):
         ]
         return [round(pose * 0.001, 3) for pose in EE_pose_lst]
 
-    def set_end_effector_post(self):
+    def set_end_effector_pose(self, X, Y, Z, RX, RY, RZ):
         """Inverse Kinematics"""
-        # TODO
+        self.MotionCtrl_2(0x01, 0x00, self.speed_rate, 0x00)
+        self.EndPoseCtrl(X*1000, Y*1000, Z*1000, RX*1000, RY*1000, RZ*1000)
         return 0
 
     def estop(self):
@@ -200,9 +201,11 @@ if __name__ == '__main__':
     arm_thread = PiperArmThread(arm)
     arm_thread.start()
     try:
-        arm.initialize()
-        arm.set_positions([0, 1, -1.57, 0, 0, 1])
-        arm.gripper_close()
+        arm.enable_fun(True)
+        arm.set_end_effector_pose(170, 10, 350, 73, 27, 72) # IK
+        for i in range(5, 0, -1):
+            logger.warning(f"sleep for {i} seconds")
+            time.sleep(1)
         arm.sleep()
 
     except KeyboardInterrupt:
