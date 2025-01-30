@@ -68,28 +68,28 @@ class PiperArm(C_PiperInterface):
     def gripper_open(self,):
         """ Opens the gripper to its maximum extent. """
         gripper_angle = 80 # degree
+        self.MotionCtrl_2(0x01, 0x01, self.speed_rate, 0x00)
         self.GripperCtrl(gripper_angle*1000, gripper_effort=800, gripper_code=0x01, set_zero=0)
-        self.wait_for_motion_complete()
         logger.info("Gripper opened.")
 
     def gripper_close(self):
         """ Closes the gripper with specified effort. """
         gripper_angle = 10
+        self.MotionCtrl_2(0x01, 0x01, self.speed_rate, 0x00)
         self.GripperCtrl(gripper_angle*1000, gripper_effort=800, gripper_code=0x01, set_zero=0)
-        self.wait_for_motion_complete()
         logger.info("Gripper closed.")
 
     def set_positions(self, joint_positions):
         """ Sets joint positions. 
             The arm expects angle in unit 0.001 degrees.
-            multiply 180/pi is from radians to degrees, 1000 is scaling factor.
-            so when we set position, we set angle in radians
+            multiply 1000 is scaling factor.
+            When we set position, we set angle in degrees
         """
         self.MotionCtrl_2(0x01, 0x01, self.speed_rate, 0x00)
         logger.info(f"Set positions: {joint_positions}")
-        joint_positions = [int(pos * 180 / math.pi * 1000) for pos in joint_positions]
+        # joint_positions = [int(pos * 180 / math.pi * 1000) for pos in joint_positions]
+        joint_positions = [int(pos * 1000) for pos in joint_positions]
         self.JointCtrl(*joint_positions)
-        self.wait_for_motion_complete()
 
     def wait_for_motion_complete(self, timeout=10):
         """ Waits until the arm completes its current motion or the timeout is reached. """
@@ -137,7 +137,7 @@ class PiperArm(C_PiperInterface):
         return 0
 
     def estop(self):
-        self.MotionCtrl_1(0x01,0,0) # Emergency Stop
+        self.MotionCtrl_1(0x01,0x03,0) # Emergency Stop
         for i in range(10, 0, -1):
             logger.warning(f"Arm reset in {i} seconds...Hold the arm!!!")
             time.sleep(1)
@@ -150,11 +150,12 @@ class PiperArm(C_PiperInterface):
 
     def sleep(self):
         self.MotionCtrl_2(0x01, 0x01, self.speed_rate, 0x00)
-        self.set_positions([0, 0, 0, 0, 0.39, 0])
+        self.set_positions([0, 0, 0, 0, 23, 0])
         self.gripper_open()
 
     def set_speed_rate(self, speed_rate):
         self.speed_rate = speed_rate
+        logger.info(f"Set moving speed to {speed_rate}%")
 
 class PiperArmThread(QThread):
     """ Thread for running Piper Arm operations. """

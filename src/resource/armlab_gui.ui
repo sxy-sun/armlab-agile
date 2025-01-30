@@ -1004,7 +1004,7 @@
                   <number>75</number>
                  </property>
                  <property name="value">
-                  <number>15</number>
+                  <number>20</number>
                  </property>
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
@@ -1020,7 +1020,7 @@
                   </size>
                  </property>
                  <property name="text">
-                  <string>15</string>
+                  <string>20</string>
                  </property>
                 </widget>
                </item>
@@ -1104,7 +1104,7 @@
                 <number>100</number>
                </property>
                <property name="value">
-                <number>0</number>
+                <number>20</number>
                </property>
                <property name="orientation">
                 <enum>Qt::Vertical</enum>
@@ -1123,7 +1123,7 @@
                 </size>
                </property>
                <property name="text">
-                <string>0</string>
+                <string>20</string>
                </property>
                <property name="alignment">
                 <set>Qt::AlignCenter</set>

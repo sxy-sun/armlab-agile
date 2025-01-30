@@ -1,3 +1,4 @@
 piper_env
 *__pycache__*
 src/piper_arm.log
+src/control_station.log

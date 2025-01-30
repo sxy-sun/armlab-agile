@@ -11,20 +11,13 @@ sudo apt-get upgrade
 sudo apt-get -y install curl wget build-essential cmake dkms \
     git autoconf automake autotools-dev gdb libglib2.0-dev libgtk2.0-dev \
     libusb-dev libusb-1.0-0-dev freeglut3-dev libboost-dev libgsl-dev \
-    net-tools doxygen  
+    net-tools   
 
+# install vscode
 wget -q https://packages.microsoft.com/keys/microsoft.asc -O- | sudo apt-key add -
 sudo add-apt-repository -y "deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main"
 sudo apt-get update
 sudo apt install -y code
-
-# Install Qt5 stuff 
-sudo apt-get -y install python3-pyqt5
-sudo apt -y install pyqt5-dev-tools
-
-#install some python packages
-sudo pip install future
-sudo pip install modern_robotics
 
 # install realsense SDK 2.0
 sudo mkdir -p /etc/apt/keyrings

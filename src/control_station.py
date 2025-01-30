@@ -6,12 +6,14 @@ import sys, logging
 import numpy as np
 from functools import partial
 from PyQt5.QtCore import QThread, Qt, pyqtSlot
-from PyQt5.QtGui import QPixmap, QImage 
+from PyQt5.QtGui import QPixmap, QImage
 from PyQt5.QtWidgets import QApplication, QWidget, QMainWindow
 from resource.ui import Ui_MainWindow
 from piper_arm import PiperArm, PiperArmThread
 from camera import Camera, VideoThread
 from state_machine import StateMachine, StateMachineThread
+import rclpy
+
 
 """ Radians to/from  Degrees conversions """
 D2R = np.pi / 180.0
@@ -93,7 +95,7 @@ class Gui(QMainWindow):
         self.ui.btnUser1.setText('Open Gripper')
         self.ui.btnUser1.clicked.connect(lambda: self.arm.gripper_open())
         self.ui.btnUser2.setText('Close Gripper')
-        self.ui.btnUser2.clicked.connect(lambda: self.arm.gripper_close)
+        self.ui.btnUser2.clicked.connect(lambda: self.arm.gripper_close())
         self.ui.btnUser3.setText('Execute')
         self.ui.btnUser3.clicked.connect(partial(nxt_if_arm_init, 'execute'))
 
@@ -101,7 +103,7 @@ class Gui(QMainWindow):
         for sldr in self.joint_sliders:
             sldr.valueChanged.connect(self.sliderChange)
         self.ui.sldrSpeed.valueChanged.connect(self.sliderChange)
-        
+
         # Direct Control
         self.ui.chk_directcontrol.stateChanged.connect(self.directControlChk)
 
@@ -159,7 +161,7 @@ class Gui(QMainWindow):
             self.ui.videoDisplay.setPixmap(QPixmap.fromImage(rgb_image))
         if (self.ui.radioDepth.isChecked()):
             self.ui.videoDisplay.setPixmap(QPixmap.fromImage(depth_image))
-        if (self.ui.radioUsr1.isChecked()):
+        if (self.ui.radioApriltag.isChecked()):
             self.ui.videoDisplay.setPixmap(QPixmap.fromImage(tag_image))
         if (self.ui.radioUsr2.isChecked()):
             self.ui.videoDisplay.setPixmap(QPixmap.fromImage(grid_image))
@@ -177,7 +179,7 @@ class Gui(QMainWindow):
         self.ui.rdoutSpeed.setText(
             str(self.ui.sldrSpeed.value()))
         self.arm.set_speed_rate(self.ui.sldrSpeed.value())
-
+    
         # Do nothing if the arm is not initialized
         if self.arm.initialized:
             joint_positions = np.array(
@@ -240,22 +242,30 @@ class Gui(QMainWindow):
         """
         self.ui.SliderFrame.setEnabled(False)
         self.ui.chk_directcontrol.setChecked(False)
-        self.sm.set_next_state('initialize_rxarm')
+        self.sm.set_next_state('initialize_arm')
 
 def main():
     """!
     @brief      Starts the GUI
     """
-    app = QApplication(sys.argv)
-    app_window = Gui()
-    app_window.show()
+    try:
+        rclpy.init()
+        app = QApplication(sys.argv)
+        app_window = Gui()
+        app_window.show()
 
-    # Set thread priorities
-    app_window.VideoThread.setPriority(QThread.HighPriority)
-    app_window.ArmThread.setPriority(QThread.NormalPriority)
-    app_window.StateMachineThread.setPriority(QThread.LowPriority)
+        # Set thread priorities
+        app_window.VideoThread.setPriority(QThread.HighPriority)
+        app_window.ArmThread.setPriority(QThread.NormalPriority)
+        app_window.StateMachineThread.setPriority(QThread.LowPriority)
 
-    sys.exit(app.exec_())
-
+        sys.exit(app.exec_())
+    except KeyboardInterrupt:
+        print("Ctrl+C detected. Shutting down...")
+    finally:
+        # (DEV) TODO: prevent ctrl+c accident, add sleep() here?
+        app_window.close()  # Trigger closeEvent
+        rclpy.shutdown()
+    
 if __name__ == '__main__':
     main()

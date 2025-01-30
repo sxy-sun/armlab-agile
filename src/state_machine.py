@@ -103,7 +103,7 @@ class StateMachine():
         """
         self.status_message = "EMERGENCY STOP! Arm fall in 10 seconds!"
         self.current_state = "estop"
-        self.arm.reset()
+        self.arm.estop()
 
     def execute(self):
         """!
@@ -137,9 +137,8 @@ class StateMachine():
         """
         self.current_state = "initialize_arm"
         self.status_message = "Piper Arm Initializing..."
-        if not self.arm.piper.initialize():
+        if not self.arm.initialize():
             self.status_message = "State: Failed to initialize the piper arm!"
-            time.sleep(5)
         self.status_message = "Piper Arm Initialized"
         self.next_state = "idle"
 
