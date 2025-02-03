@@ -130,7 +130,18 @@ class PiperArm(C_PiperInterface):
             end_effector_pose.RY_axis,
             end_effector_pose.RZ_axis,
         ]
-        return [round(pose * 0.001, 3) for pose in EE_pose_lst]
+
+        # Get Euler angles from the SDK
+        EE_pose_lst = [round(pose * 0.001, 3) for pose in EE_pose_lst]
+        # rx, ry, rz = EE_pose_lst[3:]
+
+        # Convert to quaternion (assuming ZYX order)
+        # quaternion = R.from_euler('zyx', [rz, ry, rx], degrees=True).as_quat()
+        # print("Quaternion:", quaternion)
+        # Convert back to Euler
+        # euler_check = R.from_quat(quaternion).as_euler('zyx', degrees=True)
+        # print("Recomputed Euler Angles:", euler_check)
+        return EE_pose_lst
 
     def set_end_effector_pose(self, X, Y, Z, RX, RY, RZ):
         """Inverse Kinematics"""
@@ -206,7 +217,27 @@ if __name__ == '__main__':
         for i in range(5, 0, -1):
             logger.warning(f"sleep for {i} seconds")
             time.sleep(1)
+        arm.set_end_effector_pose(170, 10, 300, 73, 27, 72) # IK
+        for i in range(5, 0, -1):
+            logger.warning(f"sleep for {i} seconds")
+            time.sleep(1)
+
+        # # Given quaternion [x, y, z, w]
+        # quaternion = [-0.148, -0.769, -0.151, -0.602]
+
+        # # Convert to Euler angles in ZYX order (used by the SDK)
+        # euler_angles = R.from_quat(quaternion).as_euler('zyx', degrees=True)
+        # # Extract RX, RY, RZ from the output
+        # rz, ry, rx =  [int(angle) for angle in euler_angles]
+
+        # print(f"Converted Euler Angles (ZYX): RX={rx:.2f}, RY={ry:.2f}, RZ={rz:.2f}")
+
+        # arm.set_end_effector_pose(52, 0, 166, rx, ry, rz) # IK
+        # for i in range(5, 0, -1):
+        #     logger.warning(f"sleep for {i} seconds")
+        #     time.sleep(1)
         arm.sleep()
+        time.sleep(3)
 
     except KeyboardInterrupt:
         print("\nKeyboardInterrupt detected. Exiting...")
@@ -215,6 +246,7 @@ if __name__ == '__main__':
         logger.error(f"Critical error: {e}", exc_info=True)
         arm.estop()
     finally:
+        arm.MotionCtrl_1(0, 0, 0x02)  
         print("Shutting down...")
         print("Torque off in 3 seconds...")
         time.sleep(3)
