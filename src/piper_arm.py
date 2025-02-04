@@ -101,6 +101,7 @@ class PiperArm(C_PiperInterface):
             motion_status = self.GetArmStatus().arm_status.motion_status
             if motion_status == 0:  #  Motion complete
                 #logger.info("Motion completed.")
+                time.sleep(0.5) # no hurry
                 return True
             if elapsed_time > timeout:
                 logger.error("Motion timeout.")
@@ -131,13 +132,10 @@ class PiperArm(C_PiperInterface):
             end_effector_pose.RZ_axis,
         ]
 
-        # Get Euler angles from the SDK
         EE_pose_lst = [round(pose * 0.001, 3) for pose in EE_pose_lst]
-        # rx, ry, rz = EE_pose_lst[3:]
 
-        # Convert to quaternion (assuming ZYX order)
+        # rx, ry, rz = EE_pose_lst[3:]
         # quaternion = R.from_euler('zyx', [rz, ry, rx], degrees=True).as_quat()
-        # print("Quaternion:", quaternion)
         # Convert back to Euler
         # euler_check = R.from_quat(quaternion).as_euler('zyx', degrees=True)
         # print("Recomputed Euler Angles:", euler_check)
@@ -196,6 +194,11 @@ class PiperArmThread(QThread):
         self.is_running = False  # Signal the loop to exit
         self.wait()  # Wait for thread to finish
 
+def wait_for_n_sec(n):
+    for i in range(n, 0, -1):
+        logger.warning(f"sleep for {i} seconds")
+        time.sleep(1)
+
 if __name__ == '__main__':
     logging.basicConfig(
         level=logging.INFO,  # Change to DEBUG if needed
@@ -213,31 +216,15 @@ if __name__ == '__main__':
     arm_thread.start()
     try:
         arm.enable_fun(True)
-        arm.set_end_effector_pose(170, 10, 350, 73, 27, 72) # IK
-        for i in range(5, 0, -1):
-            logger.warning(f"sleep for {i} seconds")
-            time.sleep(1)
-        arm.set_end_effector_pose(170, 10, 300, 73, 27, 72) # IK
-        for i in range(5, 0, -1):
-            logger.warning(f"sleep for {i} seconds")
-            time.sleep(1)
-
-        # # Given quaternion [x, y, z, w]
-        # quaternion = [-0.148, -0.769, -0.151, -0.602]
-
-        # # Convert to Euler angles in ZYX order (used by the SDK)
-        # euler_angles = R.from_quat(quaternion).as_euler('zyx', degrees=True)
-        # # Extract RX, RY, RZ from the output
-        # rz, ry, rx =  [int(angle) for angle in euler_angles]
-
-        # print(f"Converted Euler Angles (ZYX): RX={rx:.2f}, RY={ry:.2f}, RZ={rz:.2f}")
-
-        # arm.set_end_effector_pose(52, 0, 166, rx, ry, rz) # IK
-        # for i in range(5, 0, -1):
-        #     logger.warning(f"sleep for {i} seconds")
-        #     time.sleep(1)
+        # arm.set_end_effector_pose(170, 10, 300, 73, 27, 72)  
+        # arm.set_end_effector_pose(135,9,161,178,6,-178)  
+        # arm.set_end_effector_pose(222,128,155,175,20,-157) 
+        # arm.set_end_effector_pose(359,3,170,179,20,179)  
+        arm.set_end_effector_pose(290, -10, 190, -180, 0, 180)  
+        arm.wait_for_motion_complete()
+        # wait_for_n_sec(3)
         arm.sleep()
-        time.sleep(3)
+        wait_for_n_sec(3)
 
     except KeyboardInterrupt:
         print("\nKeyboardInterrupt detected. Exiting...")
