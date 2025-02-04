@@ -63,6 +63,7 @@ class Gui(QMainWindow):
             self.ui.sldrJ5,
             self.ui.sldrJ6
         ]
+
         """Objects Using Other Classes"""
         self.camera = Camera()
         print("Creating piper arm...")
@@ -101,6 +102,9 @@ class Gui(QMainWindow):
         for sldr in self.joint_sliders:
             sldr.valueChanged.connect(self.sliderChange)
         self.ui.sldrSpeed.valueChanged.connect(self.sliderChange)
+
+        # Store the original values of the sliders
+        self.original_slider_values = [sldr.value() for sldr in self.joint_sliders]
 
         # Direct Control
         self.ui.chk_directcontrol.stateChanged.connect(self.directControlChk)
@@ -197,6 +201,11 @@ class Gui(QMainWindow):
             self.sm.set_next_state("manual")
             self.arm.sleep()
             self.ui.SliderFrame.setEnabled(True)
+            
+            # Reset sliders to original values
+            for sldr, rdout, orig_value in zip(self.joint_sliders, self.joint_slider_rdouts, self.original_slider_values):
+                sldr.setValue(orig_value)
+                rdout.setText(str(orig_value))
         else:
             # Lock sliders and go to idle
             self.sm.set_next_state("idle")

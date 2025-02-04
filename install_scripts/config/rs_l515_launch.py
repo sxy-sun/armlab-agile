@@ -58,7 +58,7 @@ configurable_parameters = [{'name': 'camera_name',                  'default': '
                            {'name': 'initial_reset',                'default': 'false', 'description': "''"},                           
                            {'name': 'allow_no_texture_points',      'default': 'false', 'description': "''"},                           
                            {'name': 'pointcloud.ordered_pc',        'default': 'false', 'description': ''},
-                           {'name': 'publish_tf',                   'default': 'true', 'description': '[bool] enable/disable publishing static & dynamic TF'},
+                           {'name': 'publish_tf',                   'default': 'false', 'description': '[bool] enable/disable publishing static & dynamic TF'},
                            {'name': 'tf_publish_rate',              'default': '10.0', 'description': '[double] rate in Hz for publishing dynamic TF'},
                            {'name': 'diagnostics_period',           'default': '0.0', 'description': 'Rate of publishing diagnostics. 0=Disabled'},
                            {'name': 'decimation_filter.enable',     'default': 'false', 'description': 'Rate of publishing static_tf'},
@@ -74,8 +74,8 @@ configurable_parameters = [{'name': 'camera_name',                  'default': '
                            {'name': 'wait_for_device_timeout',      'default': '-1.', 'description': 'Timeout for waiting for device to connect (Seconds)'},
                            {'name': 'reconnect_timeout',            'default': '6.', 'description': 'Timeout(seconds) between consequtive reconnection attempts'},
                            {'name': 'temporal_filter.enable',       'default': 'true', 'description': ''}, 
-                           {'name': 'temporal_filter.filter_smooth_alpha', 'default': '0.2', 'description': "''"},      
-                           {'name': 'temporal_filter.filter_smooth_delta', 'default': '80', 'description': "''"}, 
+                           {'name': 'temporal_filter.filter_smooth_alpha', 'default': '0.1', 'description': "''"},      
+                           {'name': 'temporal_filter.filter_smooth_delta', 'default': '90', 'description': "''"}, 
                            {'name': 'temporal_filter.persistence_control', 'default': '3', 'description': "''"}, 
  
                           ]
